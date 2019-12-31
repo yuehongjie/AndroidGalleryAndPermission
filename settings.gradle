@@ -1,0 +1,2 @@
+include ':app', ':gallery'
+rootProject.name='Android10'
