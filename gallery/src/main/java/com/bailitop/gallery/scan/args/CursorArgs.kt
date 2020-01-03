@@ -1,6 +1,7 @@
 package com.bailitop.gallery.scan.args
 
 import android.provider.MediaStore
+import com.bailitop.gallery.scan.ScanConst
 import com.bailitop.gallery.scan.ScanEntity
 
 internal object CursorArgs {
@@ -28,4 +29,33 @@ internal object CursorArgs {
         Columns.HEIGHT,
         Columns.DATE_MODIFIED
     )
+
+    /**
+     * 排序条件：修改时间倒叙
+     */
+    const val ORDER_BY = "${ Columns.DATE_MODIFIED} +  DESC"
+
+    /**
+     * 基础查询条件：目前是两个 MEDIA_TYPE ，实际查询时，可能只有一个填值，如果
+     */
+    const val ALL_SELECTION = "${Columns.SIZE} > 0 and ${Columns.MEDIA_TYPE} =? or ${Columns.MEDIA_TYPE} =? "
+
+    /**
+     * 查询条件：查找某个目录下的
+     */
+    fun getParentSelection(parent: Long) = "${Columns.PARENT} = $parent and ($ALL_SELECTION)"
+
+    /**
+     * 查询条件：查询某个媒体文件
+     */
+    fun getSingleSelection(id: Long) = """${Columns.ID} = "$id" and ($ALL_SELECTION)"""
+
+    /**
+     * 查询类型，这里是条件中 MEDIA_TYPE =? 对应的值
+     */
+    fun getSelectioneArgs(scanType: Int): Array<String> = when(scanType) {
+        ScanConst.VIDEO -> arrayOf(Columns.VIDEO)
+        ScanConst.IMAGE -> arrayOf(Columns.IMAGE)
+        else -> arrayOf(Columns.IMAGE, Columns.VIDEO) // ScanConst.MIX
+    }
 }

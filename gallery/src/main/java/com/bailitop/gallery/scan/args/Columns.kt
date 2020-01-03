@@ -55,19 +55,19 @@ object Columns {
 
     //下面几个是 Android10 加入的
     /**
-     * 视频时长
+     * 视频时长（Android10）
      */
     const val DURATION = MediaStore.Files.FileColumns.DURATION
     /**
-     * 方向
+     * 方向（Android10）
      */
     const val ORIENTATION = MediaStore.Files.FileColumns.ORIENTATION
     /**
-     * bucket_id
+     * bucket_id（Android10）
      */
     const val BUCKET_ID = MediaStore.Files.FileColumns.BUCKET_ID
     /**
-     * 文件夹名称
+     * 文件夹名称（Android10）
      */
     const val BUCKET_DISPLAY_NAME = MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME
 }

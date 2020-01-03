@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.bailitop.gallery.scan.args.Columns
 import kotlinx.android.parcel.Parcelize
 
-// kotlin 扩展，自动帮忙生成可序列化的代码
+// @Parcelize 是 kotlin 扩展，自动帮忙生成可序列化的代码
 @Parcelize
 data class ScanEntity(
     var id: Long = 0,
@@ -20,5 +20,9 @@ data class ScanEntity(
     var width: Int = 0,
     var height: Int = 0,
     var dataModified: Long = 0,
+
+    /** 当前目录下的照片数 */
     var count: Int = 0,
+
+    /** 该图片是否被选中 */
     var isCheck: Boolean = false) : Parcelable

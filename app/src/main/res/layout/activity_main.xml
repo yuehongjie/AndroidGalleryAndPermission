@@ -21,5 +21,11 @@
         android:text="从图库选择"
         android:onClick="selectImage"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开 ClassIn App"
+        android:textAllCaps="false"
+        android:onClick="openClassInTest"/>
 
 </LinearLayout>
