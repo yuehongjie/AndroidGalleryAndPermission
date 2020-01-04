@@ -33,7 +33,7 @@ internal object CursorArgs {
     /**
      * 排序条件：修改时间倒叙
      */
-    const val ORDER_BY = "${ Columns.DATE_MODIFIED} +  DESC"
+    const val ORDER_BY = "${ Columns.DATE_MODIFIED} DESC"
 
     /**
      * 基础查询条件：目前是两个 MEDIA_TYPE ，实际查询时，可能只有一个填值，如果

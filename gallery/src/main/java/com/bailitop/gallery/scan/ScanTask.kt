@@ -3,25 +3,28 @@ package com.bailitop.gallery.scan
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
+import android.util.Log
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import com.bailitop.gallery.scan.args.Columns
 import com.bailitop.gallery.scan.args.CursorArgs
+import java.util.*
 
 /**
  * 扫描图片要执行的任务
  * loaderSuccess：扫描成功后，调用的方法，是一个高阶函数
  */
-class ScanTask(private val context: Context, private val loaderSuccess: (ArrayList<ScanEntity>) -> Unit):LoaderManager.LoaderCallbacks<Cursor> {
+class ScanTask(private val context: Context, private val loaderSuccess: (LinkedList<ScanEntity>) -> Unit):LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * 扫描结果
      */
-    private val resultList = ArrayList<ScanEntity>()
+    private val resultList = LinkedList<ScanEntity>()
 
     // 构建查询条件 创建查询器
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        Log.d("ScanTask", "onCreateLoader: $id")
         //传入的参数
 
         //扫描文件夹
@@ -41,6 +44,8 @@ class ScanTask(private val context: Context, private val loaderSuccess: (ArrayLi
             else -> CursorArgs.getParentSelection(scanParent)
         }
 
+        Log.d("ScanTask", "scanParent: $scanParent ; scanSingleFile: $scanSingleFile ; scanType: $scanType ; selection: $selection")
+
         return CursorLoader(
             context,
             CursorArgs.FILE_URI,    //查询外部媒体
@@ -53,6 +58,9 @@ class ScanTask(private val context: Context, private val loaderSuccess: (ArrayLi
 
     //加载完成
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+
+        Log.d("ScanTask", "onLoadFinished")
+
         val cursor = data?: return // 查询失败
 
         // 取数据，先确定索引
@@ -95,7 +103,7 @@ class ScanTask(private val context: Context, private val loaderSuccess: (ArrayLi
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>) {
-
+        Log.d("ScanTask", "onLoaderReset")
     }
 
 }

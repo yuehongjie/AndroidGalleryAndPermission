@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.bailitop.gallery.ui.activity.GalleryActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,5 +31,9 @@ class MainActivity : AppCompatActivity() {
         }else {
             Toast.makeText(this, "没有安装 ClassIn App", Toast.LENGTH_LONG).show()
         }
+    }
+
+    fun startSelfGallery(view: View) {
+        startActivity(Intent(this, GalleryActivity::class.java))
     }
 }

@@ -2,5 +2,8 @@
 <resources>
 
     <color name="gallery_text_color">#141414</color>
+    <color name="half_trans_color">#80000000</color>
+    <color name="photo_mask_color">#33000000</color>
+    <color name="status_bar_color">#ffffff</color>
 
 </resources>

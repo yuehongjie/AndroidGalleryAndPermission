@@ -5,6 +5,9 @@ object ScanConst {
     /** 全部图片和视频，parent id 即父文件夹 id*/
     const val ALL = -1L
 
+    /** 拍照 Id */
+    const val CAMERA_ID = -2L
+
     /** 扫描的类型：图片 */
     const val IMAGE = 0
 

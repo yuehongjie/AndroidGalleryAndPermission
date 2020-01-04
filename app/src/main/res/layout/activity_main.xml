@@ -28,4 +28,10 @@
         android:textAllCaps="false"
         android:onClick="openClassInTest"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="自定义图库"
+        android:onClick="startSelfGallery"/>
+
 </LinearLayout>
