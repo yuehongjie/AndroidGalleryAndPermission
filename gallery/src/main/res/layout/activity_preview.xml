@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.activity.GalleryActivity">
+    tools:context=".ui.activity.PreviewActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="图片选择"
+            android:text="1/1"
             android:textSize="16sp"
             android:textColor="@color/gallery_text_color"/>
 
@@ -36,71 +36,58 @@
             android:id="@+id/tvSure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:text="确定"
             android:textSize="16sp"
-            android:textColor="@color/selector_text_clickable"
-            android:background="?android:selectableItemBackground"/>
+            android:textColor="@color/selector_text_clickable"/>
 
     </LinearLayout>
+
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
         android:background="@color/gallery_divider_color"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvGallery"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpPreview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:layout_margin="2dp"/>
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
         android:background="@color/gallery_divider_color"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:id="@+id/tvShowFinder"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:gravity="end"
+        android:background="@color/white_color">
+        <CheckBox
+            android:id="@+id/preCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:background="?android:selectableItemBackground"
-            android:text="全部"
-            android:textSize="16sp"
+            android:layout_gravity="center_vertical"
+            android:button="@drawable/selector_preview_item_check"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择"
             android:textColor="@color/gallery_text_color"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:drawablePadding="10dp"
-            android:drawableEnd="@drawable/ic_gallery_up"/>
-
-        <TextView
-            android:id="@+id/tvPreview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?android:selectableItemBackground"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
             android:textSize="16sp"
-            android:textColor="@color/selector_text_clickable"
-            android:text="预览"/>
-
-    </RelativeLayout>
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="5dp"/>
+    </LinearLayout>
 
 </LinearLayout>

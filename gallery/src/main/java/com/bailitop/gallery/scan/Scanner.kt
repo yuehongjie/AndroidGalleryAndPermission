@@ -110,7 +110,7 @@ class Scanner(private val context: FragmentActivity, private val scanType:Int, p
             finderList.add(first)
         }
 
-        Log.d("Scanner", "finderList: ${finderList.map { "${it.parent} : ${it.bucketDisplayName} : ${it.count}" }}")
+        Log.d("Scanner", "finderList: ${finderList.map { "${it.bucketDisplayName} : ${it.count} | " }}")
 
     }
 

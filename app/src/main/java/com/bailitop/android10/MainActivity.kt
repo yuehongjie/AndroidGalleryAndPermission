@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.bailitop.gallery.constant.GalleryConstant
+import com.bailitop.gallery.scan.ScanEntity
 import com.bailitop.gallery.ui.activity.GalleryActivity
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +36,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startSelfGallery(view: View) {
-        startActivity(Intent(this, GalleryActivity::class.java))
+        startActivityForResult(Intent(this, GalleryActivity::class.java), GalleryConstant.REQUEST_CODE_GALLERY)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        //从相册页面回传的数据
+        if (requestCode == GalleryConstant.REQUEST_CODE_GALLERY &&
+            resultCode == GalleryConstant.RESULT_CODE_GALLERY) {
+
+            val resultBundle = data?.extras ?: Bundle.EMPTY
+
+            val selectedList = resultBundle.getParcelableArrayList<ScanEntity>(GalleryConstant.KEY_SELECT_LIST)
+
+            if (selectedList.isNullOrEmpty()) {
+                Toast.makeText(this, "没有选择任何照片", Toast.LENGTH_LONG).show()
+            }else {
+                Toast.makeText(this, "选中 ${selectedList.size} 张照片", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }

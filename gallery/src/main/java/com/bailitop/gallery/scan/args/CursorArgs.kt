@@ -1,5 +1,6 @@
 package com.bailitop.gallery.scan.args
 
+import android.net.Uri
 import android.provider.MediaStore
 import com.bailitop.gallery.scan.ScanConst
 import com.bailitop.gallery.scan.ScanEntity
@@ -9,7 +10,7 @@ internal object CursorArgs {
     /**
      * 扫描的 Uri：外部存储
      */
-    val FILE_URI = MediaStore.Files.getContentUri("external")
+    val FILE_URI: Uri = MediaStore.Files.getContentUri("external")
 
     /**
      * 查询的字段信息，对应图片信息 [ScanEntity]

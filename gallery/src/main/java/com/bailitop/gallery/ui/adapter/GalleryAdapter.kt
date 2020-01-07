@@ -1,52 +1,92 @@
 package com.bailitop.gallery.ui.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bailitop.gallery.R
-import com.bailitop.gallery.scan.ScanConst
+import com.bailitop.gallery.ext.display
+import com.bailitop.gallery.ext.externalUri
 import com.bailitop.gallery.scan.ScanEntity
-import com.bailitop.gallery.ui.adapter.vh.CameraViewHodler
-import com.bailitop.gallery.ui.adapter.vh.PhotoViewHolder
 import java.util.*
 
-class GalleryAdapter(val galleryList: List<ScanEntity>, val selectedList: LinkedList<ScanEntity>, val displaySize: Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class GalleryAdapter(
+    private val galleryList: List<ScanEntity>,
+    private val selectedList: ArrayList<ScanEntity>,
+    private val displaySize: Int) : RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>(){
 
-    companion object{
-        /** 显示照片 */
-        private const val TYPE_PHOTO = 0
-        /** 拍照 */
-        private const val TYPE_CAMERA = 1
-    }
+    private var galleryItemListener: OnGalleryItemListener ?= null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when(viewType) {
-            TYPE_CAMERA -> {
-                val cameraView = LayoutInflater.from(parent.context).inflate(R.layout.item_camera, parent, false)
-                CameraViewHodler(cameraView)
-            }
-            else -> {
-                val photoView = LayoutInflater.from(parent.context).inflate(R.layout.item_photo, parent, false)
-                PhotoViewHolder(photoView)
-            }
-        }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+
+        val photoView = LayoutInflater.from(parent.context).inflate(R.layout.item_photo, parent, false)
+        return PhotoViewHolder(photoView)
+
     }
 
     override fun getItemCount(): Int = galleryList.size
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is CameraViewHodler) {
-            holder.bindCamera()
-        }else if (holder is PhotoViewHolder) {
-            holder.bindPhoto(galleryList[position], selectedList, displaySize)
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
+
+        val scanEntity = galleryList[position]
+
+        holder.ivPhoto.display(scanEntity.externalUri(), displaySize)
+
+        holder.viewMask.visibility = if (scanEntity.isCheck) View.VISIBLE else View.INVISIBLE
+
+        holder.checkBox.isChecked = scanEntity.isCheck
+        holder.checkBox.setOnClickListener {
+
+            scanEntity.isCheck = !scanEntity.isCheck
+
+            //根据 id 查找选中列表中是否已有相同的数据
+            val old = selectedList.find { it.id == scanEntity.id }
+
+            // 删除旧的 id 相同的数据
+            if (old != null) {
+                selectedList.remove(old)
+            }
+
+            //如果选中，则添加新的
+            if (scanEntity.isCheck) {
+                selectedList.add(scanEntity)
+            }
+
+            holder.viewMask.visibility = if (scanEntity.isCheck) View.VISIBLE else View.INVISIBLE
+
+            //选中数量变化回调
+            galleryItemListener?.onSelectedCountChange()
+        }
+
+        //预览
+        holder.itemView.setOnClickListener {
+            galleryItemListener?.onGalleryItemClick(position)
         }
     }
 
+    fun setOnGalleryItemListener(listener: OnGalleryItemListener) {
+        galleryItemListener = listener
+    }
+
+    interface OnGalleryItemListener {
+        /** item 点击 */
+        fun onGalleryItemClick(position: Int)
+        /** 选中数量变化 */
+        fun onSelectedCountChange()
+    }
+
     /**
-     * 如果某个位置（一般是第一个）ScanEntity 的 id 是 CAMERA_ID 表示拍照，否则表示显示照片
+     * 显示照片的 ViewHolder
      */
-    override fun getItemViewType(position: Int): Int {
-        return if (galleryList[position].id == ScanConst.CAMERA_ID) TYPE_CAMERA else TYPE_PHOTO
+    class PhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+
+        val ivPhoto: ImageView = itemView.findViewById(R.id.ivPhoto)
+        val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
+        val viewMask: View = itemView.findViewById(R.id.viewMask)
+
     }
 
 }

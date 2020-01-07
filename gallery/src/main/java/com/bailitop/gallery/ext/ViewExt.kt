@@ -14,3 +14,11 @@ fun ImageView.display(uri: Uri, size: Int){
     Glide.with(this).load(uri).apply(options).into(this)
 
 }
+
+fun ImageView.display(uri: Uri){
+
+    val options: RequestOptions = RequestOptions()
+        .placeholder(R.drawable.ic_gallery_default_loading)
+    Glide.with(this).load(uri).apply(options).into(this)
+
+}

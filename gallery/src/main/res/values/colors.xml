@@ -2,8 +2,11 @@
 <resources>
 
     <color name="gallery_text_color">#141414</color>
+    <color name="gallery_grey_color">#999999</color>
     <color name="half_trans_color">#80000000</color>
     <color name="photo_mask_color">#33000000</color>
     <color name="status_bar_color">#ffffff</color>
+    <color name="white_color">#ffffff</color>
+    <color name="gallery_divider_color">#E8E8E8</color>
 
 </resources>
