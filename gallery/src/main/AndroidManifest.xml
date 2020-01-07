@@ -8,15 +8,17 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-        <activity android:name=".ui.activity.TakePhotoActivity"></activity>
+        <activity android:name=".ui.activity.TakePhotoActivity"
+            android:theme="@style/TakePhotoStyle"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activity.PreviewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/GalleryTheme" />
         <activity
             android:name=".ui.activity.GalleryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/GalleryTheme" />
     </application>
 
 </manifest>

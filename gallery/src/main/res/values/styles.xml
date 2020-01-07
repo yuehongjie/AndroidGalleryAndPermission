@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="GalleryTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+
+    <!-- 透明 activity 样式 -->
+    <style name="TakePhotoStyle" parent="GalleryTheme">
+
+        <!--是否半透明-->
+        <item name="android:windowIsTranslucent">true</item>
+        <!--设置dialog的背景-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景是否模糊显示-->
+        <item name="android:backgroundDimEnabled">false</item>
+        <!--设置窗口内容不覆盖-->
+        <item name="android:windowContentOverlay">@null</item>
+        <!--点击空白地方关闭-->
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <!--是否浮现在activity之上-->
+        <item name="android:windowIsFloating">true</item>
+        <!--设置动画，在这里使用让它继承系统的Animation.Dialog-->
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+
+    </style>
+
+</resources>

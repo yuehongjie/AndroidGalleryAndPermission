@@ -11,7 +11,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bailitop.gallery.R
-import com.bailitop.gallery.constant.GalleryConstant
+import com.bailitop.gallery.bean.PhotoResult
+import com.bailitop.gallery.constant.GalleryInnerConstant
+import com.bailitop.gallery.constant.GalleryResult
+import com.bailitop.gallery.ext.externalUri
 import com.bailitop.gallery.ext.statusBarColor
 import com.bailitop.gallery.ext.toast
 import com.bailitop.gallery.scan.ScanConst
@@ -21,7 +24,7 @@ import com.bailitop.gallery.scan.Scanner
 import com.bailitop.gallery.ui.adapter.GalleryAdapter
 import com.bailitop.gallery.ui.widget.FinderDialog
 import com.bailitop.gallery.ui.widget.SimpleGridDivider
-import kotlinx.android.synthetic.main.activity_gallery.*
+import kotlinx.android.synthetic.main.activity_gallery_gallery.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -49,7 +52,7 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gallery)
+        setContentView(R.layout.activity_gallery_gallery)
 
         //设置状态栏颜色
         window.statusBarColor(ContextCompat.getColor(this, R.color.status_bar_color))
@@ -208,14 +211,14 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
         //预览
         val intent = Intent(this, PreviewActivity::class.java)
         val bundle = Bundle().apply {
-            putParcelableArrayList(GalleryConstant.KEY_GALLERY_LIST, allList)
-            putParcelableArrayList(GalleryConstant.KEY_SELECT_LIST, selectList)
-            putInt(GalleryConstant.KEY_CURR_POSITION, position)
+            putParcelableArrayList(GalleryInnerConstant.KEY_GALLERY_LIST, allList)
+            putParcelableArrayList(GalleryInnerConstant.KEY_SELECT_LIST, selectList)
+            putInt(GalleryInnerConstant.KEY_CURR_POSITION, position)
         }
 
         intent.putExtras(bundle)
         //打开预览，并需要返回值
-        startActivityForResult(intent, GalleryConstant.REQUEST_CODE_PREVIEW)
+        startActivityForResult(intent, GalleryInnerConstant.REQUEST_CODE_PREVIEW)
     }
 
     /**
@@ -225,14 +228,14 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
         super.onActivityResult(requestCode, resultCode, data)
 
         //从预览页面回传的数据
-        if (requestCode == GalleryConstant.REQUEST_CODE_PREVIEW) {
+        if (requestCode == GalleryInnerConstant.REQUEST_CODE_PREVIEW) {
 
             val resultBundle = data?.extras ?: Bundle.EMPTY
 
-            val isSelectListChange = resultBundle.getBoolean(GalleryConstant.KEY_IS_SELECT_LIST_CHANGE)
-            val isDoneFinish = resultBundle.getBoolean(GalleryConstant.KEY_IS_DONE_FINISH)
+            val isSelectListChange = resultBundle.getBoolean(GalleryInnerConstant.KEY_IS_SELECT_LIST_CHANGE)
+            val isDoneFinish = resultBundle.getBoolean(GalleryInnerConstant.KEY_IS_DONE_FINISH)
             if (isSelectListChange) { //选中的数据变化
-                val newSelectList = resultBundle.getParcelableArrayList<ScanEntity>(GalleryConstant.KEY_SELECT_LIST) ?: ArrayList()
+                val newSelectList = resultBundle.getParcelableArrayList<ScanEntity>(GalleryInnerConstant.KEY_SELECT_LIST) ?: ArrayList()
                 Log.d("GalleryActivity", "newSelectedList: ${newSelectList.map { it.id }}")
                 selectedList.clear()
                 selectedList.addAll(newSelectList)
@@ -259,10 +262,12 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
      */
     private fun resultFinish() {
         val resultIntent = Intent()
-        val bundle = Bundle()
-        bundle.putParcelableArrayList(GalleryConstant.KEY_SELECT_LIST, selectedList)
-        resultIntent.putExtras(bundle)
-        setResult(GalleryConstant.RESULT_CODE_GALLERY, resultIntent)
+        val resultList = ArrayList<PhotoResult>(selectedList.size)
+        selectedList.forEach {
+            resultList.add(PhotoResult(it.externalUri()))
+        }
+        resultIntent.putParcelableArrayListExtra(GalleryResult.KEY_RESULT_SELECT_LIST, resultList)
+        setResult(GalleryResult.RESULT_CODE_GALLERY, resultIntent)
         finish()
     }
 

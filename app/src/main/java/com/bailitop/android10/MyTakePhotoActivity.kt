@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class TakePhotoActivity : AppCompatActivity() {
+class MyTakePhotoActivity : AppCompatActivity() {
 
     companion object {
         // 申请相机权限的 requestCode

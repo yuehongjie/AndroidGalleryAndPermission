@@ -8,11 +8,11 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.bailitop.gallery.R
-import com.bailitop.gallery.constant.GalleryConstant
+import com.bailitop.gallery.constant.GalleryInnerConstant
 import com.bailitop.gallery.ext.statusBarColor
 import com.bailitop.gallery.scan.ScanEntity
 import com.bailitop.gallery.ui.adapter.PreviewAdapter
-import kotlinx.android.synthetic.main.activity_preview.*
+import kotlinx.android.synthetic.main.activity_preview_gallery.*
 import kotlin.collections.ArrayList
 
 class PreviewActivity : AppCompatActivity() {
@@ -32,7 +32,7 @@ class PreviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preview)
+        setContentView(R.layout.activity_preview_gallery)
 
         //设置状态栏颜色
         window.statusBarColor(ContextCompat.getColor(this, R.color.status_bar_color))
@@ -40,9 +40,9 @@ class PreviewActivity : AppCompatActivity() {
         /** 取数据，优先级：被迫销毁时存储的 -> 传入的 -> 空的 */
         val galleryBundle = savedInstanceState ?: intent.extras ?: Bundle.EMPTY
         //取数据
-        galleryList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryConstant.KEY_GALLERY_LIST) ?: ArrayList()
-        selectedList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryConstant.KEY_SELECT_LIST) ?: ArrayList()
-        currPosition = galleryBundle.getInt(GalleryConstant.KEY_CURR_POSITION, 0)
+        galleryList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryInnerConstant.KEY_GALLERY_LIST) ?: ArrayList()
+        selectedList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryInnerConstant.KEY_SELECT_LIST) ?: ArrayList()
+        currPosition = galleryBundle.getInt(GalleryInnerConstant.KEY_CURR_POSITION, 0)
         total = galleryList.size
 
         initView()
@@ -53,9 +53,9 @@ class PreviewActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState, outPersistentState)
         Log.d("PreviewActivity", "onSaveInstanceState")
         outState.apply {
-            putParcelableArrayList(GalleryConstant.KEY_GALLERY_LIST, galleryList)
-            putParcelableArrayList(GalleryConstant.KEY_SELECT_LIST, selectedList)
-            putInt(GalleryConstant.KEY_CURR_POSITION, currPosition)
+            putParcelableArrayList(GalleryInnerConstant.KEY_GALLERY_LIST, galleryList)
+            putParcelableArrayList(GalleryInnerConstant.KEY_SELECT_LIST, selectedList)
+            putInt(GalleryInnerConstant.KEY_CURR_POSITION, currPosition)
         }
     }
 
@@ -140,13 +140,14 @@ class PreviewActivity : AppCompatActivity() {
         val resultIntent = Intent()
         val bundle = Bundle()
         if (isSelectListChange) { //减少数据传递，只有变化时，才传递选中的数据列表
-            bundle.putParcelableArrayList(GalleryConstant.KEY_SELECT_LIST, selectedList)
+            bundle.putParcelableArrayList(GalleryInnerConstant.KEY_SELECT_LIST, selectedList)
         }
-        bundle.putBoolean(GalleryConstant.KEY_IS_SELECT_LIST_CHANGE, isSelectListChange)
-        bundle.putBoolean(GalleryConstant.KEY_IS_DONE_FINISH, isDoneFinish)
+        bundle.putBoolean(GalleryInnerConstant.KEY_IS_SELECT_LIST_CHANGE, isSelectListChange)
+        bundle.putBoolean(GalleryInnerConstant.KEY_IS_DONE_FINISH, isDoneFinish)
         resultIntent.putExtras(bundle)
-        setResult(GalleryConstant.RESULT_CODE_PREVIEW, resultIntent)
+        setResult(GalleryInnerConstant.RESULT_CODE_PREVIEW, resultIntent)
 
+        // super 要写在 setResult 后面，否则无法携带数据返回
         super.onBackPressed()
     }
 
