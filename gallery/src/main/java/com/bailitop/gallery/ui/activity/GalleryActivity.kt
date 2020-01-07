@@ -32,7 +32,7 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
     FinderDialog.OnFinderSelectListener {
 
     companion object{
-        const val PERMISSION_STORAGE_REQUEST_CODE = 0x04
+        private const val PERMISSION_STORAGE_REQUEST_CODE = 0x04
     }
 
     /** 选中的列表 */

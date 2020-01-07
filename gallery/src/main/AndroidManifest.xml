@@ -10,15 +10,18 @@
     <application>
         <activity android:name=".ui.activity.TakePhotoActivity"
             android:theme="@style/TakePhotoStyle"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity
             android:name=".ui.activity.PreviewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/GalleryTheme" />
+            android:theme="@style/GalleryTheme"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity
             android:name=".ui.activity.GalleryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/GalleryTheme" />
+            android:theme="@style/GalleryTheme"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
     </application>
 
 </manifest>

@@ -27,10 +27,10 @@ class TakePhotoActivity : AppCompatActivity() {
 
     companion object {
         // 申请相机权限的 requestCode
-        const val PERMISSION_REQUEST_CODE = 0x01
+        private const val PERMISSION_REQUEST_CODE = 0x01
 
         // 拍照的 requestCode
-        const val CAMERA_REQUEST_CODE = 0x02
+        private const val CAMERA_REQUEST_CODE = 0x02
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
