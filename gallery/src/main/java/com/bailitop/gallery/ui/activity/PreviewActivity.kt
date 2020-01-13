@@ -1,19 +1,20 @@
 package com.bailitop.gallery.ui.activity
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.bailitop.gallery.R
+import com.bailitop.gallery.bean.GalleryConfig
 import com.bailitop.gallery.constant.GalleryInnerConstant
 import com.bailitop.gallery.ext.statusBarColor
+import com.bailitop.gallery.ext.toast
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanEntity
 import com.bailitop.gallery.ui.adapter.PreviewAdapter
 import kotlinx.android.synthetic.main.activity_preview_gallery.*
-import kotlin.collections.ArrayList
 
 class PreviewActivity : AppCompatActivity() {
 
@@ -30,6 +31,10 @@ class PreviewActivity : AppCompatActivity() {
     /** 是否点击了完成按钮，需要销毁相册页面 */
     private var isDoneFinish = false
 
+    private lateinit var galleryConfig: GalleryConfig
+    private var imageLoader: IGalleryImageLoader?= null
+    private var maxSelectCount: Int = 3
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview_gallery)
@@ -40,28 +45,34 @@ class PreviewActivity : AppCompatActivity() {
         /** 取数据，优先级：被迫销毁时存储的 -> 传入的 -> 空的 */
         val galleryBundle = savedInstanceState ?: intent.extras ?: Bundle.EMPTY
         //取数据
+        galleryConfig = galleryBundle.getParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG) ?: GalleryConfig()
+        imageLoader = galleryBundle.getParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER)
         galleryList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryInnerConstant.KEY_GALLERY_LIST) ?: ArrayList()
         selectedList = galleryBundle.getParcelableArrayList<ScanEntity>(GalleryInnerConstant.KEY_SELECT_LIST) ?: ArrayList()
         currPosition = galleryBundle.getInt(GalleryInnerConstant.KEY_CURR_POSITION, 0)
         total = galleryList.size
+        maxSelectCount = galleryConfig.maxSelectCount
 
         initView()
     }
 
     /** 存储数据，被迫销毁后， 恢复现场用 */
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
         Log.d("PreviewActivity", "onSaveInstanceState")
         outState.apply {
             putParcelableArrayList(GalleryInnerConstant.KEY_GALLERY_LIST, galleryList)
             putParcelableArrayList(GalleryInnerConstant.KEY_SELECT_LIST, selectedList)
             putInt(GalleryInnerConstant.KEY_CURR_POSITION, currPosition)
+            //传入配置和图片加载器
+            putParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG, galleryConfig)
+            putParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER, imageLoader)
         }
     }
 
     private fun initView() {
 
-        adapter = PreviewAdapter(galleryList)
+        adapter = PreviewAdapter(galleryList, imageLoader)
         vpPreview.adapter = adapter
         //注册翻页监听
         pageChangeCallback = object : ViewPager2.OnPageChangeCallback(){
@@ -84,7 +95,6 @@ class PreviewActivity : AppCompatActivity() {
         //复选框点击
         preCheckbox.setOnClickListener {
             val currEntity = galleryList[currPosition]
-            currEntity.isCheck = !currEntity.isCheck
 
             //根据 id 查找选中列表中是否已有相同的数据
             val old = selectedList.find { it.id == currEntity.id }
@@ -92,7 +102,16 @@ class PreviewActivity : AppCompatActivity() {
             // 删除旧的 id 相同的数据
             if (old != null) {
                 selectedList.remove(old)
+            }else{
+                //想添加新的，先检查是否查过最大数
+                if (selectedList.size >= maxSelectCount) {
+                    preCheckbox.isChecked = false
+                    toast("最多可以选择 $maxSelectCount 张图片")
+                    return@setOnClickListener
+                }
             }
+
+            currEntity.isCheck = !currEntity.isCheck
 
             //需要加入新的数据
             if (currEntity.isCheck) {
@@ -125,7 +144,7 @@ class PreviewActivity : AppCompatActivity() {
         val selectedCount = selectedList.size
         if (selectedCount > 0) {
             tvSure.isEnabled = true
-            tvSure.text = "确定($selectedCount)"
+            tvSure.text = "确定(${selectedCount}/${maxSelectCount})"
         }else {
             tvSure.isEnabled = false
             tvSure.text = "确定"

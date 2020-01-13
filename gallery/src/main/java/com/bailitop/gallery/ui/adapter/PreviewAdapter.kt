@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bailitop.gallery.R
-import com.bailitop.gallery.ext.display
 import com.bailitop.gallery.ext.externalUri
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanEntity
 
-class PreviewAdapter(val galleryList: ArrayList<ScanEntity>): RecyclerView.Adapter<PreviewAdapter.PreviewHolder>(){
+class PreviewAdapter(
+    private val galleryList: ArrayList<ScanEntity>,
+    private val imageLoader: IGalleryImageLoader?): RecyclerView.Adapter<PreviewAdapter.PreviewHolder>(){
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewHolder {
@@ -21,7 +23,7 @@ class PreviewAdapter(val galleryList: ArrayList<ScanEntity>): RecyclerView.Adapt
     override fun getItemCount(): Int = galleryList.size
 
     override fun onBindViewHolder(holder: PreviewHolder, position: Int) {
-        holder.ivPreview.display(galleryList[position].externalUri())
+        imageLoader?.displayPreviewImage(holder.ivPreview, galleryList[position].externalUri())
     }
 
 

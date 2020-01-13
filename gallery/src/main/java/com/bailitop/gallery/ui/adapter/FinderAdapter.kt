@@ -7,12 +7,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bailitop.gallery.R
-import com.bailitop.gallery.ext.display
+import com.bailitop.gallery.bean.GalleryConfig
 import com.bailitop.gallery.ext.externalUri
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanConst
 import com.bailitop.gallery.scan.ScanEntity
 
-class FinderAdapter (private val finderList: List<ScanEntity>): RecyclerView.Adapter<FinderAdapter.FinderHolder>() {
+class FinderAdapter (private val finderList: List<ScanEntity>,
+                     private val galleryConfig: GalleryConfig,
+                     private val imageLoader: IGalleryImageLoader?): RecyclerView.Adapter<FinderAdapter.FinderHolder>() {
 
     private var itemListener: OnFinderItemClickListener ?= null
     var currSelection: Int = 0
@@ -26,8 +29,8 @@ class FinderAdapter (private val finderList: List<ScanEntity>): RecyclerView.Ada
 
     override fun onBindViewHolder(holder: FinderHolder, position: Int) {
         val currEntity = finderList[position]
-        holder.ivFinderCover.display(currEntity.externalUri())
-        holder.tvFinderName.text = if (currEntity.parent == ScanConst.ALL) "全部" else currEntity.bucketDisplayName
+        imageLoader?.displayFinderImage(holder.ivFinderCover, currEntity.externalUri())
+        holder.tvFinderName.text = if (currEntity.parent == ScanConst.ALL) galleryConfig.allFinderName else currEntity.bucketDisplayName
         holder.tvPhotoCount.text = "(${currEntity.count})"
         holder.ivSelector.visibility = if (position == currSelection) View.VISIBLE else View.INVISIBLE
 

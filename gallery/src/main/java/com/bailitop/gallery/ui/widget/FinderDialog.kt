@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bailitop.gallery.R
+import com.bailitop.gallery.bean.GalleryConfig
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanEntity
 import com.bailitop.gallery.ui.adapter.FinderAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -12,7 +14,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 /**
  * 目录显示
  */
-class FinderDialog (private val activity:Activity): BottomSheetDialog(activity),
+class FinderDialog (private val activity:Activity,
+                    private val galleryConfig: GalleryConfig,
+                    private val imageLoader: IGalleryImageLoader?): BottomSheetDialog(activity),
     FinderAdapter.OnFinderItemClickListener {
 
     private var finderRecyclerView: RecyclerView
@@ -42,7 +46,7 @@ class FinderDialog (private val activity:Activity): BottomSheetDialog(activity),
         }
 
         if (finderAdapter == null) {
-            finderAdapter = FinderAdapter(this.finderList)
+            finderAdapter = FinderAdapter(this.finderList, galleryConfig, imageLoader)
             finderAdapter?.currSelection = position
             finderAdapter?.setOnFinderItemClickListener(this)
             finderRecyclerView.layoutManager = LinearLayoutManager(activity)

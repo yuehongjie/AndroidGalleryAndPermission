@@ -3,20 +3,23 @@ package com.bailitop.gallery.ui.activity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bailitop.gallery.R
+import com.bailitop.gallery.bean.GalleryConfig
 import com.bailitop.gallery.bean.PhotoResult
 import com.bailitop.gallery.constant.GalleryInnerConstant
 import com.bailitop.gallery.constant.GalleryResult
 import com.bailitop.gallery.ext.externalUri
 import com.bailitop.gallery.ext.statusBarColor
 import com.bailitop.gallery.ext.toast
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanConst
 import com.bailitop.gallery.scan.ScanEntity
 import com.bailitop.gallery.scan.ScanView
@@ -33,6 +36,23 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
     companion object{
         private const val PERMISSION_STORAGE_REQUEST_CODE = 0x04
+
+        /**
+         * 入口：打开图库 拾取图片
+         */
+        fun startForResult(activity: FragmentActivity, requestCode: Int, galleryConfig: GalleryConfig, imageLoader: IGalleryImageLoader){
+            //打开图库
+            val intent = Intent(activity, GalleryActivity::class.java)
+            val bundle = Bundle().apply {
+                //传入配置和图片加载器
+                putParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG, galleryConfig)
+                putParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER, imageLoader)
+            }
+
+            intent.putExtras(bundle)
+            //打开预览，并需要返回值
+            activity.startActivityForResult(intent, requestCode)
+        }
     }
 
     /** 选中的列表 */
@@ -44,11 +64,12 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
     private var scanner: Scanner ?= null
 
-    private var spanCount: Int = 4
-
     private var currScanParent: Long = ScanConst.ALL
 
     private var finderDialog: FinderDialog ?= null
+
+    private lateinit var galleryConfig: GalleryConfig
+    private var imageLoader: IGalleryImageLoader ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +80,26 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
         scanner = Scanner(this, ScanConst.IMAGE, this)
 
+        /** 取数据，优先级：被迫销毁时存储的 -> 传入的 -> 空的 */
+        val galleryBundle = savedInstanceState ?: intent.extras ?: Bundle.EMPTY
+        galleryConfig = galleryBundle.getParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG) ?: GalleryConfig()
+        imageLoader = galleryBundle.getParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER)
+
+        //设置标题
+        tvTitle.text = galleryConfig.galleryTitle
+        //默认显示全部图片目录
+        tvShowFinder.text = galleryConfig.allFinderName
+
         rvGallery.setHasFixedSize(true)
-        rvGallery.layoutManager = GridLayoutManager(this, spanCount)
+        rvGallery.layoutManager = GridLayoutManager(this, galleryConfig.spanCount)
         rvGallery.addItemDecoration(SimpleGridDivider(4))
-        galleryAdapter = GalleryAdapter(galleryList, selectedList, displaySize(spanCount))
+        galleryAdapter = GalleryAdapter(
+            galleryList,
+            selectedList,
+            displaySize(galleryConfig.spanCount),
+            galleryConfig.maxSelectCount,
+            imageLoader
+        )
         rvGallery.adapter = galleryAdapter
         galleryAdapter?.setOnGalleryItemListener(this)
 
@@ -70,6 +107,14 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
         checkViewEnable()
         initListeners()
+    }
+
+    /** 存储数据，被迫销毁后， 恢复现场用 */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        //传入配置和图片加载器
+        outState.putParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG, galleryConfig)
+        outState.putParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER, imageLoader)
     }
 
     private fun initListeners() {
@@ -169,7 +214,7 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
     override fun onRefreshFinders(finderList: LinkedList<ScanEntity>) {
 
         if (finderDialog == null) {
-            finderDialog = FinderDialog(this)
+            finderDialog = FinderDialog(this, galleryConfig, imageLoader)
             finderDialog?.setOnFinderSelectListener(this)
         }
         finderDialog?.setFinderData(finderList, currScanParent)
@@ -200,6 +245,11 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
         checkViewEnable()
     }
 
+    //达到最大选择数量
+    override fun onGalleryMaxCount(maxCount: Int) {
+        toast("最多可以选择 $maxCount 张图片")
+    }
+
     // ------------------------------------- OnGalleryItemListener End ----------------------------------------
 
     /**
@@ -211,6 +261,10 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
         //预览
         val intent = Intent(this, PreviewActivity::class.java)
         val bundle = Bundle().apply {
+            //传入配置和图片加载器
+            putParcelable(GalleryInnerConstant.KEY_GALLERY_CONFIG, galleryConfig)
+            putParcelable(GalleryInnerConstant.KEY_IMAGE_LOADER, imageLoader)
+            //传入列表和位置
             putParcelableArrayList(GalleryInnerConstant.KEY_GALLERY_LIST, allList)
             putParcelableArrayList(GalleryInnerConstant.KEY_SELECT_LIST, selectList)
             putInt(GalleryInnerConstant.KEY_CURR_POSITION, position)
@@ -287,7 +341,7 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
             tvPreview.isEnabled = true
             tvSure.isEnabled = true
             tvPreview.text = "预览($selectedCount)"
-            tvSure.text = "确定($selectedCount)"
+            tvSure.text = "确定(${selectedCount}/${galleryConfig.maxSelectCount})"
         }else {
             tvPreview.isEnabled = false
             tvSure.isEnabled = false

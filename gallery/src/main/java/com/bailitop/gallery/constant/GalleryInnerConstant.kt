@@ -45,4 +45,15 @@ object GalleryInnerConstant {
      */
     const val KEY_IS_SELECT_LIST_CHANGE = "key_is_select_list_change"
 
+
+    /**
+     * Key 值：基础配置
+     */
+    const val KEY_GALLERY_CONFIG = "key_gallery_config"
+
+    /**
+     * Key 值：图片加载器
+     */
+    const val KEY_IMAGE_LOADER = "key_image_loader"
+
 }

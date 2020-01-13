@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import com.bailitop.android10.util.GalleryImageLoader
+import com.bailitop.gallery.bean.GalleryConfig
 import com.bailitop.gallery.bean.PhotoResult
 import com.bailitop.gallery.constant.GalleryResult
 import com.bailitop.gallery.ui.activity.GalleryActivity
@@ -28,7 +30,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startSelfGallery(view: View) {
-        startActivityForResult(Intent(this, GalleryActivity::class.java), REQUEST_CODE_GALLERY)
+        GalleryActivity.startForResult(
+            this,
+            REQUEST_CODE_GALLERY,
+            GalleryConfig(9, 3, "上传图片", "全部图片"),
+            GalleryImageLoader()
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

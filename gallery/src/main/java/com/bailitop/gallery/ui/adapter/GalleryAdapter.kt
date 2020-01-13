@@ -7,15 +7,17 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bailitop.gallery.R
-import com.bailitop.gallery.ext.display
 import com.bailitop.gallery.ext.externalUri
+import com.bailitop.gallery.loader.IGalleryImageLoader
 import com.bailitop.gallery.scan.ScanEntity
 import java.util.*
 
 class GalleryAdapter(
     private val galleryList: List<ScanEntity>,
     private val selectedList: ArrayList<ScanEntity>,
-    private val displaySize: Int) : RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>(){
+    private val displaySize: Int,
+    private val maxSelectedCount: Int,
+    private val imageLoader: IGalleryImageLoader?) : RecyclerView.Adapter<GalleryAdapter.PhotoViewHolder>(){
 
     private var galleryItemListener: OnGalleryItemListener ?= null
 
@@ -33,14 +35,13 @@ class GalleryAdapter(
 
         val scanEntity = galleryList[position]
 
-        holder.ivPhoto.display(scanEntity.externalUri(), displaySize)
+        //holder.ivPhoto.display(scanEntity.externalUri(), displaySize)
+        imageLoader?.displayGalleryImage(holder.ivPhoto, scanEntity.externalUri(), displaySize)
 
         holder.viewMask.visibility = if (scanEntity.isCheck) View.VISIBLE else View.INVISIBLE
 
         holder.checkBox.isChecked = scanEntity.isCheck
         holder.checkBox.setOnClickListener {
-
-            scanEntity.isCheck = !scanEntity.isCheck
 
             //根据 id 查找选中列表中是否已有相同的数据
             val old = selectedList.find { it.id == scanEntity.id }
@@ -48,7 +49,17 @@ class GalleryAdapter(
             // 删除旧的 id 相同的数据
             if (old != null) {
                 selectedList.remove(old)
+            }else {
+                //想添加新的，先检查是否查过最大数
+                if (selectedList.size >= maxSelectedCount) {
+                    holder.checkBox.isChecked = false
+                    galleryItemListener?.onGalleryMaxCount(maxSelectedCount)
+                    return@setOnClickListener
+                }
+
             }
+
+            scanEntity.isCheck = !scanEntity.isCheck
 
             //如果选中，则添加新的
             if (scanEntity.isCheck) {
@@ -76,6 +87,9 @@ class GalleryAdapter(
         fun onGalleryItemClick(position: Int)
         /** 选中数量变化 */
         fun onSelectedCountChange()
+        /** 已达到最大可选数量 */
+        fun onGalleryMaxCount(maxCount: Int)
+
     }
 
     /**
