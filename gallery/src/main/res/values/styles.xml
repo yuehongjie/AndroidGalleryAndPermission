@@ -23,4 +23,10 @@
 
     </style>
 
+    <style name="GalleryLoadingDialogStyle" parent="Theme.AppCompat.Light.Dialog" >
+        <item name="colorAccent">@color/white_color</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
 </resources>

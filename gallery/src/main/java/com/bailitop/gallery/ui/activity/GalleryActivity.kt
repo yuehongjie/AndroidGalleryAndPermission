@@ -26,6 +26,7 @@ import com.bailitop.gallery.scan.ScanView
 import com.bailitop.gallery.scan.Scanner
 import com.bailitop.gallery.ui.adapter.GalleryAdapter
 import com.bailitop.gallery.ui.widget.FinderDialog
+import com.bailitop.gallery.ui.widget.GalleryLoadingDialog
 import com.bailitop.gallery.ui.widget.SimpleGridDivider
 import kotlinx.android.synthetic.main.activity_gallery_gallery.*
 import java.util.*
@@ -70,6 +71,8 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
 
     private lateinit var galleryConfig: GalleryConfig
     private var imageLoader: IGalleryImageLoader ?= null
+
+    private var loadingDialog: GalleryLoadingDialog ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -191,6 +194,7 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
     }
 
     private fun scan(parent: Long) {
+        //showLoadingDialog()
         currScanParent = parent
         scanner?.scan(parent)
     }
@@ -204,6 +208,8 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
         this.galleryList.clear()
         this.galleryList.addAll(galleryList)
         this.galleryAdapter?.notifyDataSetChanged()
+
+        //hideLoadingDialog()
 
     }
 
@@ -349,6 +355,17 @@ class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryI
             tvSure.text = "确定"
         }
 
+    }
+
+    private fun showLoadingDialog() {
+        if (loadingDialog == null) {
+            loadingDialog = GalleryLoadingDialog(this)
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        loadingDialog?.dismiss()
     }
 
 }

@@ -8,9 +8,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
+        <!--8.0 手机 透明的 Activity 不能在 manifest 中固定方向-->
         <activity android:name=".ui.activity.TakePhotoActivity"
             android:theme="@style/TakePhotoStyle"
-            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
         <activity
             android:name=".ui.activity.PreviewActivity"
