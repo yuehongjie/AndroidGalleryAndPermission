@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun takePhoto(view: View) {
+        //startActivity(Intent(this, MyTakePhotoActivity::class.java))
         startActivityForResult(Intent(this, TakePhotoActivity::class.java), REQUEST_CODE_TAKE_PHOTO)
     }
 

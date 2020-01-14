@@ -17,13 +17,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bailitop.gallery.bean.PhotoResult
 import com.bailitop.gallery.constant.GalleryResult
+import com.bailitop.gallery.ext.hasQ
+import com.bailitop.gallery.scan.SingleMediaScanner
+import java.io.File
 
 /**
  * 拍照 是一个完全透明的 Activity，主题设置了点击透明区域会消失（对用户不可见，防止用户假死在这个页面）
  */
-class TakePhotoActivity : AppCompatActivity() {
+class TakePhotoActivity : AppCompatActivity(), SingleMediaScanner.SingleScannerListener {
 
     private var mPhotoUri: Uri ?= null
+    private var singleMediaScanner: SingleMediaScanner? = null
 
     companion object {
         // 申请相机权限的 requestCode
@@ -96,12 +100,35 @@ class TakePhotoActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                resultFinish()
+                scanImage()
             }else {
                 finish()
             }
         }
     }
+
+    private fun scanImage() {
+
+        Log.d("TakePhotoActivity", "拍照成功，扫描照片")
+
+        uriToPath(mPhotoUri)?.let {
+            //先取消上次的扫描
+            singleMediaScanner?.disconnect()
+            singleMediaScanner = SingleMediaScanner(this, it, this@TakePhotoActivity)
+        }
+    }
+
+    // ----------------------  SingleScannerListener start ------------------------
+    override fun onScanStart() {
+        Log.d("TakePhotoActivity", "扫描开始")
+    }
+
+    override fun onScanCompleted(path: String?, uri: Uri?) {
+        Log.d("TakePhotoActivity", "扫描完成 path: $path   uri: $uri")
+        resultFinish()
+    }
+    // ----------------------  SingleScannerListener end ------------------------
+
 
     /**
      * 携带数据返回上级页面
@@ -144,13 +171,62 @@ class TakePhotoActivity : AppCompatActivity() {
      * 而是使用自己的私有外部存储或者公共的外部媒体存储区域
      */
     private fun createImageUri(): Uri? {
-        val status = Environment.getExternalStorageState()
-        return if (Environment.MEDIA_MOUNTED == status ) {
-            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-        }else {
-            contentResolver.insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, ContentValues())
+
+        val imageFile = createImageFile()
+
+        Log.d("TakePhotoActivity", "imageFile path: ${imageFile.path}")
+
+        val contentValues = ContentValues().apply {
+            if (hasQ()) {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, imageFile.name)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
+            }else {
+                put(MediaStore.MediaColumns.DATA, imageFile.path)
+            }
         }
+
+        return if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        } else {
+            contentResolver.insert(MediaStore.Images.Media.INTERNAL_CONTENT_URI, contentValues)
+        }
+
     }
 
+    private fun createImageFile(): File {
+        val fileName = "${System.currentTimeMillis()}.jpg"
+        if (hasQ()) {
+            return File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).path, fileName)
+        }
 
+        val storageDir = if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState() || !Environment.isExternalStorageRemovable()){
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).path
+        }else {
+            externalCacheDir?.path
+        }
+
+        return File(storageDir, fileName)
+    }
+
+    /**
+     * uri 转真实路径
+     */
+    private fun uriToPath(uri: Uri?): String? {
+        if (uri == null) return null
+        contentResolver.query(uri, arrayOf(MediaStore.MediaColumns.DATA), null, null, null).use {
+            //use 扩展会自动关闭 cursor
+            val cursor = it ?: return null
+            val dataColumnIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+            while (cursor.moveToNext()) {
+                return cursor.getString(dataColumnIndex)
+            }
+        }
+
+        return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        singleMediaScanner?.disconnect()
+    }
 }

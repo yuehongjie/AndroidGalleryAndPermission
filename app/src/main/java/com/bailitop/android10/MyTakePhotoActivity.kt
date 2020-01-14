@@ -54,12 +54,13 @@ class MyTakePhotoActivity : AppCompatActivity() {
 
         //检查相机权限
         val hasPermission = ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA)
-        if (hasPermission == PackageManager.PERMISSION_GRANTED) {
+        val hasStoragePermission = ContextCompat.checkSelfPermission(application, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (hasPermission == PackageManager.PERMISSION_GRANTED && hasStoragePermission == PackageManager.PERMISSION_GRANTED) {
             //有权限，调用相机拍照
             openCamera()
         }else {
             //没有权限，申请权限
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_CAMERA_REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA,  Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_CAMERA_REQUEST_CODE)
         }
     }
 
