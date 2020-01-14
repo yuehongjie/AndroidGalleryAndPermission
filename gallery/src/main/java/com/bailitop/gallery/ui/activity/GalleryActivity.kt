@@ -32,6 +32,9 @@ import kotlinx.android.synthetic.main.activity_gallery_gallery.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * 相册：照片选择器 参考（抄）：https://github.com/7449/Album
+ */
 class GalleryActivity : AppCompatActivity(), ScanView, GalleryAdapter.OnGalleryItemListener,
     FinderDialog.OnFinderSelectListener {
 
