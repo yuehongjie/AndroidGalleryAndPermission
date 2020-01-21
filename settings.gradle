@@ -1,2 +1,2 @@
-include ':app', ':gallery'
+include ':app', ':gallery', ':mpermission'
 rootProject.name='Android10'

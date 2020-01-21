@@ -27,4 +27,10 @@
         android:text="自定义图库"
         android:onClick="startSelfGallery"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="权限申请测试"
+        android:onClick="permissionTest"/>
+
 </LinearLayout>

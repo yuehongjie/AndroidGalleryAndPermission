@@ -68,4 +68,10 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_CODE_GALLERY = 111
         private const val REQUEST_CODE_TAKE_PHOTO = 222
     }
+
+    //权限申请测试
+    fun permissionTest(view: View) {
+
+        startActivity(Intent(this, PermissionTestActivity::class.java))
+    }
 }
