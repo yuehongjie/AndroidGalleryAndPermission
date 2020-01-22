@@ -21,23 +21,29 @@ data class FragmentTarget(val fragment: Fragment): Target()
  */
 fun AppCompatActivity.runWithPermissions(
     permissions: Array<String>,
+    options: MPermissionOptions = MPermissionOptions(),
     callback: () -> Unit
-) = handlePermissions(ActivityTarget(this), permissions, callback)
+) = handlePermissions(ActivityTarget(this), permissions, options, callback)
 
+/**
+ * 请求权限，并在获得权限后，执行相应的操作
+ */
 fun Fragment.runWithPermissions(
     permissions: Array<String>,
+    options: MPermissionOptions = MPermissionOptions(),
     callback: () -> Unit
-) = handlePermissions(FragmentTarget(this), permissions, callback)
+) = handlePermissions(FragmentTarget(this), permissions, options, callback)
 
 
 private fun handlePermissions(
     target: Target,
     permissions: Array<String>,
+    options: MPermissionOptions,
     callback: () -> Unit
 ){
 
     log("准备请求权限")
-    log("需要请求的权限有: $permissions")
+    log("需要请求的权限有: ${permissions.toList()}")
 
     val context = when(target) {
         is ActivityTarget -> target.activity
@@ -62,7 +68,7 @@ private fun handlePermissions(
             fm.beginTransaction().add(permissionCheckFragment, TAG).commitNow()
         }
 
-        permissionCheckFragment.requestPermissions(permissions)
+        permissionCheckFragment.requestPermissions(permissions, options, callback)
 
     }
 

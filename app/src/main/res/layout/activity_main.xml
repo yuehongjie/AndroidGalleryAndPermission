@@ -30,7 +30,13 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="权限申请测试"
+        android:text="Activity 权限申请测试"
         android:onClick="permissionTest"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fragment 权限申请测试"
+        android:onClick="permissionTestForFragment"/>
 
 </LinearLayout>
